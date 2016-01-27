@@ -117,11 +117,11 @@ class Manager {
 	private function getResult($params) {
 		$this->result = json_decode($this->curl($this->getApi(), http_build_query(array_merge(['partner_code' => $this->partner_code, 'secret_key' => $this->secret_key], $params))));
 
-		if(!$this->result){
+		if(!$this->result) {
 			return false;
 		}
 
-		if(!$this->result->success){
+		if(!$this->result->success) {
 			$reason_code = explode(':', $this->result->reason_code);
 			$this->errcode = $reason_code[0];
 			$this->errmsg = $reason_code[1];
@@ -148,7 +148,7 @@ class Manager {
 	 * @return {string}
 	 */
 	private function getApi() {
-		if(!$this->api){
+		if(!$this->api) {
 			$this->api = 'https://api' . ($this->dev ? 'test' : '') . '.fraudmetrix.cn/riskService';
 		}
 
