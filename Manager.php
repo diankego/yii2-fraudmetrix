@@ -5,7 +5,7 @@
  * https://github.com/diankego/yii2-fraudmetrix
  * https://raw.githubusercontent.com/diankego/yii2-fraudmetrix/master/LICENSE
  * create: 2016/1/26
- * update: 2016/1/27
+ * update: 2016/2/1
  * version: 0.0.1
  */
 
@@ -422,8 +422,6 @@ class Manager {
 
 		$data = curl_exec($curl);
 		curl_close($curl);
-
-		echo $data;
 
 		return $data;
 	}
