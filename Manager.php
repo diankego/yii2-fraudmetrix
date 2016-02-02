@@ -5,7 +5,7 @@
  * https://github.com/diankego/yii2-fraudmetrix
  * https://raw.githubusercontent.com/diankego/yii2-fraudmetrix/master/LICENSE
  * create: 2016/1/26
- * update: 2016/2/1
+ * update: 2016/2/2
  * version: 0.0.1
  */
 
@@ -45,26 +45,25 @@ class Manager {
 	 * @since 0.0.1
 	 * @param {string} $account_login 登录账户名
 	 * @param {string} $account_mobile 注册手机
-	 * @param {string} [$account_email] 注册邮箱
-	 * @param {string} [$id_number] 注册身份证
-	 * @param {string} [$account_password] 注册密码摘要：建议先加密后再提供
-	 * @param {string} [$rem_code] 注册邀请码
-	 * @param {int} [$state] 状态校验结果
+	 * @param {array} [$options=[]] 可选参数
+	 * @param {string} [$options[account_email]] 注册邮箱
+	 * @param {string} [$options[id_number]] 注册身份证
+	 * @param {string} [$options[account_password]] 注册密码摘要：建议先加密后再提供
+	 * @param {string} [$options[rem_code]] 注册邀请码
+	 * @param {int} [$options[state]] 状态校验结果
+	 * @param {string} [$options[token_id]] TokenId, 设备ID
 	 * @return {boolean}
-	 * @example \Yii::$app->fraudmetrix->checkRegister($account_login, $account_mobile, $account_email, $id_number, $account_password, $rem_code, $state);
+	 * @example \Yii::$app->fraudmetrix->checkRegister($account_login, $account_mobile, $options);
 	 */
-	public function checkRegister($account_login, $account_mobile, $account_email = null, $id_number = null, $account_password = null, $rem_code = null, $state = null) {
-		return $this->getResult([
+	public function checkRegister($account_login, $account_mobile, $options = []) {
+		$params = array_merge([
 			'event_id' => 'register_professional_web',
 			'ip_address' => $this->getUserIp(),
 			'account_login' => $account_login,
 			'account_mobile' => $account_mobile,
-			'account_email' => $account_email,
-			'id_number' => $id_number,
-			'account_password' => $account_password,
-			'rem_code' => $rem_code,
-			'state' => $state,
-		]);
+		], $options);
+
+		return $this->getResult($params);
 	}
 
 	/**
@@ -72,19 +71,21 @@ class Manager {
 	 * @method checkLogin
 	 * @since 0.0.1
 	 * @param {string} $account_login 登录账户名
-	 * @param {int} $state 状态校验结果(密码校验结果：0表示密码正确，1表示密码错误)
-	 * @param {string} [$account_password] 登录密码摘要：建议先加密后再提供
+	 * @param {array} [$options=[]] 可选参数
+	 * @param {string} [$options[token_id]] TokenId, 设备ID
+	 * @param {string} [$options[account_password]] 登录密码摘要：建议先加密后再提供
+	 * @param {int} [$options[state]] 状态校验结果
 	 * @return {boolean}
-	 * @example \Yii::$app->fraudmetrix->checkLogin($account_login, $state, $account_password);
+	 * @example \Yii::$app->fraudmetrix->checkLogin($account_login, $options);
 	 */
-	public function checkLogin($account_login, $state = null, $account_password = null) {
-		return $this->getResult([
+	public function checkLogin($account_login, $options = []) {
+		$params = array_merge([
 			'event_id' => 'login_professional_web',
 			'ip_address' => $this->getUserIp(),
 			'account_login' => $account_login,
-			'state' => $state,
-			'account_password' => $account_password,
-		]);
+		], $options);
+
+		return $this->getResult($params);
 	}
 
 	/**
@@ -92,19 +93,21 @@ class Manager {
 	 * @method checkSms
 	 * @since 0.0.1
 	 * @param {string} $account_mobile 申请验证码手机号
-	 * @param {string} [$sms_content] 短信内容
-	 * @param {int} [$state] 状态校验结果
+	 * @param {array} [$options=[]] 可选参数
+	 * @param {string} [$options[sms_content]] 短信内容
+	 * @param {int} [$options[state]] 状态校验结果
+	 * @param {string} [$options[token_id]] TokenId, 设备ID
 	 * @return {boolean}
-	 * @example \Yii::$app->fraudmetrix->checkSms($account_mobile, $sms_content, $state);
+	 * @example \Yii::$app->fraudmetrix->checkSms($account_mobile, $options);
 	 */
-	public function checkSms($account_mobile, $sms_content = null, $state = null) {
-		return $this->getResult([
+	public function checkSms($account_mobile, $options = []) {
+		$params = array_merge([
 			'event_id' => 'sms_professional_web',
 			'ip_address' => $this->getUserIp(),
 			'account_mobile' => $account_mobile,
-			'sms_content' => $sms_content,
-			'state' => $state,
-		]);
+		], $options);
+
+		return $this->getResult($params);
 	}
 
 	/**
@@ -115,7 +118,7 @@ class Manager {
 	 * @param {string} $id_number 借款人身份证
 	 * @param {string} $account_email 借款人邮箱
 	 * @param {string} $account_mobile 借款人手机
-	 * @param {array} [$options=[]] 可选参数, 有以下字段
+	 * @param {array} [$options=[]] 可选参数
 	 * @param {boolean} [$options[ip_address]=false] 是否提交用户侧IP地址或借款人IP地址
 	 * @param {string} [$options[account_login]] 借款人账号(登录信贷理财平台的账户名)
 	 * @param {string} [$options[account_phone]] 借款人座机(示例如057126307516)
@@ -133,6 +136,7 @@ class Manager {
 	 * @param {string} [$options[contacts_id_number]] 联系人身份证
 	 * @param {string} [$options[contacts_address]] 联系人地址
 	 * @param {string} [$options[state]] 状态校验结果
+	 * @param {string} [$options[token_id]] TokenId, 设备ID
 	 * @return {boolean}
 	 * @example \Yii::$app->fraudmetrix->checkLoan($account_name, $id_number, $account_email, $account_mobile, $options);
 	 */
@@ -158,26 +162,25 @@ class Manager {
 	 * @since 0.0.1
 	 * @param {string} $account_login 账户名
 	 * @param {string} $account_mobile 账户手机
-	 * @param {string} [$id_number] 账户身份证
-	 * @param {string} [$account_email] 账户邮箱
-	 * @param {int} [$item_count] 商品数量
-	 * @param {array} [$items] 商品列表
-	 * @param {int} [$state] 营销结果
+	 * @param {array} [$options=[]] 可选参数
+	 * @param {string} [$options[id_number]] 账户身份证
+	 * @param {string} [$options[account_email]] 账户邮箱
+	 * @param {string} [$options[item_count]] 商品数量
+	 * @param {array} [$options[items]] 商品列表
+	 * @param {int} [$options[state]] 营销结果
+	 * @param {string} [$options[token_id]] TokenId, 设备ID
 	 * @return {boolean}
-	 * @example \Yii::$app->fraudmetrix->checkMarketing($account_login, $account_mobile, $id_number, $account_email, $item_count, $items, $state);
+	 * @example \Yii::$app->fraudmetrix->checkMarketing($account_login, $account_mobile, $options);
 	 */
-	public function checkMarketing($account_login, $account_mobile, $id_number = null, $account_email = null, $item_count = null, $items = null, $state = null) {
-		return $this->getResult([
+	public function checkMarketing($account_login, $account_mobile, $options = []) {
+		$params = array_merge([
 			'event_id' => 'marketing_professional_web',
 			'ip_address' => $this->getUserIp(),
 			'account_login' => $account_login,
 			'account_mobile' => $account_mobile,
-			'id_number' => $id_number,
-			'account_email' => $account_email,
-			'item_count' => $item_count,
-			'items' => $items,
-			'state' => $state,
-		]);
+		], $options);
+
+		return $this->getResult($params);
 	}
 
 	/**
@@ -199,7 +202,7 @@ class Manager {
 	 * @param {string} $deliver_address_county 收货人街区地址
 	 * @param {string} $deliver_address_city 收货人城市地址
 	 * @param {string} $deliver_address_province 收货人省份地址
-	 * @param {array} [$options=[]] 可选参数, 有以下字段
+	 * @param {array} [$options=[]] 可选参数
 	 * @param {string} [$options[account_name]] 买家姓名
 	 * @param {string} [$options[id_number]] 买家身份证
 	 * @param {string} [$options[account_email]] 买家邮箱
@@ -220,6 +223,7 @@ class Manager {
 	 * @param {string} [$options[account_address_country]] 买家国家地址
 	 * @param {string} [$options[account_zip_code]] 买家邮编
 	 * @param {string} [$options[state]] 状态校验结果
+	 * @param {string} [$options[token_id]] TokenId, 设备ID
 	 * @return {boolean}
 	 * @example \Yii::$app->fraudmetrix->checkTrade($account_login, $account_mobile, $pay_amount, $pay_currency, $items_count, $items, $payee_userid, $payee_name, $payee_id_number, $payee_mobile, $deliver_mobile, $deliver_address_street, $deliver_address_county, $deliver_address_city, $deliver_address_province, $options);
 	 */
@@ -274,6 +278,7 @@ class Manager {
 	 * @param {string} [$options[card_accp_term_id]] 受卡机终端标识码:POS机码
 	 * @param {string} [$options[card_binding_mobile]] 银行卡手机
 	 * @param {string} [$options[state]] 状态校验结果
+	 * @param {string} [$options[token_id]] TokenId, 设备ID
 	 * @return {boolean}
 	 * @example \Yii::$app->fraudmetrix->checkPayment($account_login, $account_mobile, $pay_method, $pay_amount, $pay_currency, $options);
 	 */
@@ -300,14 +305,16 @@ class Manager {
 	 * @param {string} $id_number 账户身份证(绑卡四要素)
 	 * @param {string} $card_number 银行卡号(绑卡四要素)
 	 * @param {string} $card_binding_mobile 银行卡手机(绑卡四要素)
-	 * @param {string} [$account_mobile] 账户手机
-	 * @param {string} [$cc_bin] 卡BIN
-	 * @param {int} [$state] 状态校验结果
+	 * @param {array} [$options=[]] 可选参数
+	 * @param {string} [$options[account_mobile]] 账户手机
+	 * @param {string} [$options[cc_bin]] 卡BIN
+	 * @param {int} [$options[state]] 状态校验结果
+	 * @param {string} [$options[token_id]] TokenId, 设备ID
 	 * @return {boolean}
-	 * @example \Yii::$app->fraudmetrix->checkBinding($account_login, $account_name, $id_number, $card_number, $card_binding_mobile, $account_mobile, $cc_bin, $state);
+	 * @example \Yii::$app->fraudmetrix->checkBinding($account_login, $account_name, $id_number, $card_number, $card_binding_mobile, $options);
 	 */
-	public function checkBinding($account_login, $account_name, $id_number, $card_number, $card_binding_mobile, $account_mobile = null, $cc_bin = null, $state = null) {
-		return $this->getResult([
+	public function checkBinding($account_login, $account_name, $id_number, $card_number, $card_binding_mobile, $options = []) {
+		$params = array_merge([
 			'event_id' => 'binding_professional_web',
 			'ip_address' => $this->getUserIp(),
 			'account_login' => $account_login,
@@ -315,10 +322,9 @@ class Manager {
 			'id_number' => $id_number,
 			'card_number' => $card_number,
 			'card_binding_mobile' => $card_binding_mobile,
-			'account_mobile' => $account_mobile,
-			'cc_bin' => $cc_bin,
-			'state' => $state,
-		]);
+		], $options);
+
+		return $this->getResult($params);
 	}
 
 	/**
@@ -328,20 +334,23 @@ class Manager {
 	 * @param {string} $account_login 账户名(登录信贷理财平台的账户名)
 	 * @param {string} $account_mobile 修改手机
 	 * @param {string} $card_number 修改银行卡号
-	 * @param {string} [$account_email] 修改邮箱
-	 * @param {int} [$state] 状态校验结果
+	 * @param {array} [$options=[]] 可选参数
+	 * @param {string} [$options[account_email]] 修改邮箱
+	 * @param {int} [$options[state]] 状态校验结果
+	 * @param {string} [$options[token_id]] TokenId, 设备ID
 	 * @return {boolean}
-	 * @example \Yii::$app->fraudmetrix->checkModify($account_login, $account_mobile, $card_number, $account_email, $state);
+	 * @example \Yii::$app->fraudmetrix->checkModify($account_login, $account_mobile, $card_number, $options);
 	 */
-	public function checkModify($account_login, $account_mobile, $card_number, $account_email = null, $state = null) {
-		return $this->getResult([
+	public function checkModify($account_login, $account_mobile, $card_number, $options = []) {
+		$params = array_merge([
 			'event_id' => 'modify_professional_web',
 			'ip_address' => $this->getUserIp(),
 			'account_login' => $account_login,
 			'account_mobile' => $account_mobile,
-			'account_email' => $account_email,
-			'state' => $state,
-		]);
+			'card_number' => $card_number,
+		], $options);
+
+		return $this->getResult($params);
 	}
 
 	/**
